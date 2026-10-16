@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import math
 
 from exceptions import OutOfSampleError
-from data_representation import DataTable
 
 
 class Predictor(ABC):
@@ -12,6 +11,14 @@ class Predictor(ABC):
         Store historical DataTable.
         """
         self.historical_data = historical_data
+
+    def check_in_range(self, patient):
+        for i in range(1, 10):
+            name = f"Feature{i}"
+            low = self.historical_data.get_column_min(name)
+            high = self.historical_data.get_column_max(name)
+            if patient[name] < low or patient[name] > high:
+                raise OutOfSampleError(f"{name} with value {patient[name]} is outside historical range [{low}, {high}]")
 
     @abstractmethod
     def predict(self, patient):
@@ -35,6 +42,7 @@ class MajorityClassPredictor(Predictor):
             self.majority_class = 1.0 
 
     def predict(self, patient):
+        self.check_in_range(patient)
         return self.majority_class
 
 
@@ -52,12 +60,7 @@ class NearestNeighborPredictor(Predictor):
         
 
     def predict(self, patient):
-        for i in range(1, 10):
-                    name = f"Feature{i}"
-                    low = self.historical_data.get_column_min(name)
-                    high = self.historical_data.get_column_max(name)
-                    if patient[name] < low or patient[name] > high:
-                        raise OutOfSampleError("Input is outside historical range")
+        self.check_in_range(patient)
 
         best_distance = float("inf")
         best_label = None

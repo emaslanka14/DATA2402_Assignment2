@@ -10,17 +10,28 @@ class DataTable:
             header = next(reader)
             for name in header:
                 self.data[name] = []
-            for row_num, row in enumerate(reader, start=2):
+            for row in reader:
                 if not row:
-                    continue
-                try:
-                    converted = [float(v) for v in row]
-                except ValueError:
-                    print(f"Invalid data input in row {row_num}")
-                    continue              
-                for name, value in zip(header, converted):
-                    self.data[name].append(value)
+                    continue             
+                for name, value in zip(header, row):
+                    try:
+                        self.data[name].append(float(value))
+                    except ValueError:
+                        self.data[name].append(None)
 
+    def calc_missing_val(self, means = None):
+        if means == None:
+            means = {}
+            for name, values in self.data.items():
+                if name == "TumorType":
+                    continue
+                good = [v for v in values if v is not None]
+                means[name] = sum(good) / len(good)
+
+        for name, values in self.data.items():
+            for i in range(len(values)):
+                if values[i] is None:
+                    values[i] = means[name]
 
     def get(self, row_idx: int, col_name: str):
         column = self.get_column(col_name)
@@ -57,3 +68,4 @@ class DataTable:
     def get_column_max(self, col_name: str) -> float:
         col_values = self.get_column(col_name)
         return max(col_values)
+
