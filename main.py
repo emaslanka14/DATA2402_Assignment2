@@ -3,7 +3,7 @@ from predictors import MajorityClassPredictor, NearestNeighborPredictor
 from exceptions import OutOfSampleError
 
 
-def calculate_accuracy(predictions, actual):
+def calculate_accuracy(predictions, actual) -> str:
     correct = 0
     total = 0
 
@@ -13,8 +13,8 @@ def calculate_accuracy(predictions, actual):
         total +=1
         if pred == act:
             correct += 1
-    return correct / total
 
+    return f"{(correct / total) * 100}%" #Format as a percentage so it's easier to read
 
 def main():
 
@@ -38,7 +38,6 @@ def main():
 
     # Predict every new case
     for i in range(new_cases.get_num_rows()):
-
         patient = new_cases.get_row(i)
 
         try:
@@ -55,12 +54,11 @@ def main():
 
         except OutOfSampleError as e:
             nn_predictions.append(None)
-            print(f"Case {i}: {e}")
+            print(f"Case {i} (Nearest Neighbor): {e}")
 
 
     # Get true labels
     actual_labels = labels.get_column("TumorType")
-
 
     # Accuracy
     print(
@@ -76,7 +74,6 @@ def main():
     # Cases that fall outside historical min/max
     print(mode_predictions.count(None), nn_predictions.count(None))
 
-    
 
 if __name__ == "__main__":
     main()
