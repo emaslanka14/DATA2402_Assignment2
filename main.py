@@ -1,20 +1,7 @@
 from data_representation import DataTable
-from predictors import MajorityClassPredictor, NearestNeighborPredictor
+from predictors import MajorityClassPredictor, NearestNeighborPredictor, calculate_accuracy
 from exceptions import OutOfSampleError
 
-
-def calculate_accuracy(predictions, actual) -> str:
-    correct = 0
-    total = 0
-
-    for pred, act in zip(predictions, actual):
-        if pred is None:
-            continue
-        total +=1
-        if pred == act:
-            correct += 1
-
-    return f"{(correct / total) * 100}%" #Format as a percentage so it's easier to read
 
 def main():
 
@@ -24,8 +11,8 @@ def main():
     labels = DataTable("data/cancer_new_cases_labels.csv")
 
     # Fill missing values
-    means = historical.calc_missing_val()
-    new_cases.calc_missing_val(means)
+    historical.calc_missing_val()
+    new_cases.calc_missing_val(historical)
     
     # Create predictors
     mode_predictor = MajorityClassPredictor(historical)
