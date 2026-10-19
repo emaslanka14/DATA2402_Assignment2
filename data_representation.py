@@ -19,19 +19,23 @@ class DataTable:
                     except ValueError:
                         self.data[name].append(None)
 
-    def calc_missing_val(self, means = None):
-        if means == None:
+    def calc_missing_val(self, historicalDataTable = None):
+        
+        if historicalDataTable is None:
             means = {}
             for name, values in self.data.items():
                 if name == "TumorType":
                     continue
                 good = [v for v in values if v is not None]
                 means[name] = sum(good) / len(good)
+        else:
+            means = historicalDataTable.get_means()
 
         for name, values in self.data.items():
             for i in range(len(values)):
                 if values[i] is None:
                     values[i] = means[name]
+        return means
 
     def get(self, row_idx: int, col_name: str):
         column = self.get_column(col_name)
@@ -68,4 +72,21 @@ class DataTable:
     def get_column_max(self, col_name: str) -> float:
         col_values = self.get_column(col_name)
         return max(col_values)
+
+    def get_means(self) -> dict:
+        """
+          returns a dict where key is column name and value is the average of that column
+        """
+        means = {}
+        for name in self.get_column_names():
+            means[name] = self.get_column_average(name)
+        return means
+
+    def __str__(self):
+        lines = []
+        for i in range(self.get_num_rows()):
+            row = self.get_row(i)
+            lines.append(", ".join(str(v) for v in row.values()))
+        return "\n".join(lines)
+
 

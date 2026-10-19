@@ -1,5 +1,5 @@
 from data_representation import DataTable
-from predictors import MajorityClassPredictor, NearestNeighborPredictor
+from predictors import MajorityClassPredictor, NearestNeighborPredictor, calculate_accuracy
 from exceptions import OutOfSampleError
 
 
@@ -11,8 +11,8 @@ def main():
     labels = DataTable("data/cancer_new_cases_labels.csv")
 
     # Fill missing values
-    means = historical.calc_missing_val()
-    new_cases.calc_missing_val(means)
+    historical.calc_missing_val()
+    new_cases.calc_missing_val(historical)
     
     # Create predictors
     mode_predictor = MajorityClassPredictor(historical)
